@@ -30,7 +30,7 @@ jobs:
 
       - name: Set up OWASP ZAP
         run: |
-          docker pull owasp/zap2docker-stable
+          docker pull zaproxy/zap-stable
           docker run -u zap -d -p 8090:8090 --name zap zaproxy/zap-stable zap.sh -daemon -host 127.0.0.1 -port 8090 -config api.addrs.addr.regex=true -config api.disablekey=true
 
       - name: Wait for ZAP to start
