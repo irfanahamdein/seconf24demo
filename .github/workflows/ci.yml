@@ -15,7 +15,6 @@ jobs:
         image: zaproxy/zap-stable
         ports:
           - 8090:8090
-        options: --network host
 
     steps:
       - name: Checkout code
