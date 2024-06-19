@@ -1,0 +1,41 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      zap:
+        image: owasp/zap2docker-stable
+        ports:
+          - 8090:8090
+        options: --network host
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb
+          sudo apt-get install -f
+          google-chrome --version
+
+      - name: Run tests with Gradle
+        run: ./gradlew test -Dscan=false -Dheadless=true
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
