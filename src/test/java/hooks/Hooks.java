@@ -25,6 +25,7 @@ public class Hooks {
     private static final String ZAP_API_KEY = "changeme"; // Change this to your actual ZAP API key
     private static ClientApi api = new ClientApi(ZAP_ADDRESS, ZAP_PORT, ZAP_API_KEY);
     private String scanType = System.getProperty("scan");
+    private boolean isHeadless = Boolean.parseBoolean(System.getProperty("headless", "true"));
 
     @Before
     public void setUp() {
@@ -38,7 +39,10 @@ public class Hooks {
             options.setCapability(CapabilityType.PROXY, proxy);
         }
 
-        //options.addArguments("--headless"); // Run in headless mode if you don't need a GUI
+        if (isHeadless) {
+            options.addArguments("--headless");
+        }
+
         driver = new ChromeDriver(options);
 
         if ("active".equals(scanType)) {
