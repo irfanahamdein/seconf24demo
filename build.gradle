@@ -6,24 +6,24 @@ plugins {
 repositories {
     mavenCentral()
 }
-
 ext {
     zapVersion = '2.11.1' // Use the appropriate version for your setup
 }
 
 dependencies {
-    testImplementation 'org.seleniumhq.selenium:selenium-java:4.1.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-java:4.18.0'
     testImplementation 'io.cucumber:cucumber-java:7.0.0'
     testImplementation 'io.cucumber:cucumber-junit:7.0.0'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'io.github.bonigarcia:webdrivermanager:5.3.1'
-    testImplementation "org.zaproxy:zap-clientapi:$zapVersion"
+    testImplementation 'io.github.bonigarcia:webdrivermanager:5.8.0' // Add this line
+    implementation 'org.zaproxy:zap-clientapi:1.9.0'
+    implementation 'org.zaproxy:zap:2.10.0'
 }
 
 test {
     useJUnit()
     systemProperty 'scan', project.findProperty('scan') ?: 'false'
     systemProperty 'env', project.findProperty('env') ?: 'prod'
-    systemProperty 'headless', project.findProperty('headless') ?: 'true'
+    systemProperty 'headless', project.findProperty('headless') ?: 'false'
     systemProperty 'browser', project.findProperty('browser') ?: 'chrome'
 }
