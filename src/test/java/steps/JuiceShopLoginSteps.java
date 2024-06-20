@@ -5,11 +5,12 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.WebDriver;
 import pages.JuiceShopPage;
+import utility.ChDriver;
 
 import static org.junit.Assert.assertTrue;
 
 public class JuiceShopLoginSteps {
-    WebDriver driver = Hooks.driver;
+    WebDriver driver = ChDriver.getDriver();
     JuiceShopPage juiceShopPage = new JuiceShopPage(driver);
 
     @Given("I open Juice Shop")

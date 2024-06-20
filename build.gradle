@@ -11,6 +11,9 @@ ext {
 }
 
 dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+    implementation 'com.intuit.karate:karate-junit5:1.1.0'
     testImplementation 'org.seleniumhq.selenium:selenium-java:4.18.0'
     testImplementation 'io.cucumber:cucumber-java:7.0.0'
     testImplementation 'io.cucumber:cucumber-junit:7.0.0'
@@ -22,8 +25,8 @@ dependencies {
 
 test {
     useJUnit()
-    systemProperty 'scan', project.findProperty('scan') ?: 'false'
-    systemProperty 'env', project.findProperty('env') ?: 'prod'
-    systemProperty 'headless', project.findProperty('headless') ?: 'true'
+    systemProperty 'scan', project.findProperty('scan') ?: 'active'
+    systemProperty 'env', project.findProperty('env') ?: 'dev'
+    systemProperty 'headless', project.findProperty('headless') ?: 'false'
     systemProperty 'browser', project.findProperty('browser') ?: 'chrome'
 }
