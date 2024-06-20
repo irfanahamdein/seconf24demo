@@ -9,7 +9,7 @@ import pages.JuiceShopPage;
 import static org.junit.Assert.assertTrue;
 
 public class JuiceShopLoginSteps {
-    WebDriver driver = steps.Hooks.driver;
+    WebDriver driver = Hooks.driver;
     JuiceShopPage juiceShopPage = new JuiceShopPage(driver);
 
     @Given("I open Juice Shop")

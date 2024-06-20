@@ -12,6 +12,7 @@ import org.zaproxy.clientapi.core.ClientApi;
 import org.zaproxy.clientapi.core.ClientApiException;
 import org.zaproxy.clientapi.core.ApiResponse;
 import org.zaproxy.clientapi.core.ApiResponseElement;
+import pages.JuiceShopPage;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,6 +27,7 @@ public class Hooks {
     private static ClientApi api = new ClientApi(ZAP_ADDRESS, ZAP_PORT, ZAP_API_KEY);
     private String scanType = System.getProperty("scan");
     private boolean isHeadless = Boolean.parseBoolean(System.getProperty("headless", "true"));
+    private JuiceShopPage juiceShopPage;
 
     @Before
     public void setUp() {
@@ -44,6 +46,7 @@ public class Hooks {
         }
 
         driver = new ChromeDriver(options);
+        juiceShopPage = new JuiceShopPage(driver);
 
         if ("active".equals(scanType)) {
             try {
@@ -63,14 +66,13 @@ public class Hooks {
         if ("passive".equals(scanType)) {
             generateZapReport("passive-scan-report.html");
         } else if ("active".equals(scanType)) {
-            performActiveScan();
+            performActiveScan(juiceShopPage.getTargetUrl());
             generateZapReport("active-scan-report.html");
         }
     }
 
-    private void performActiveScan() {
+    private void performActiveScan(String targetUrl) {
         try {
-            String targetUrl = "https://demo.owasp-juice.shop"; // Change this to your actual target
             ApiResponse resp = api.ascan.scan(targetUrl, "True", "False", null, null, null);
 
             // Scan response returns scan id to support concurrent scanning.

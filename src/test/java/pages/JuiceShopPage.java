@@ -16,9 +16,9 @@ public class JuiceShopPage {
     WebDriver driver;
     WebDriverWait wait;
     Properties properties;
+    private String targetUrl;
 
     By dismissButton = By.cssSelector("button[aria-label='Close Welcome Banner']");
-
     By emailField = By.id("email");
     By passwordField = By.id("password");
     By loginButton = By.id("loginButton");
@@ -28,6 +28,7 @@ public class JuiceShopPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         this.properties = loadProperties();
         PageFactory.initElements(driver, this);
+        this.targetUrl = getProperty("url");
     }
 
     private Properties loadProperties() {
@@ -50,8 +51,7 @@ public class JuiceShopPage {
     }
 
     public void open() {
-        String url = getProperty("url");
-        driver.get(url);
+        driver.get(targetUrl);
     }
 
     public void closeWelcomePopup() {
@@ -60,8 +60,7 @@ public class JuiceShopPage {
     }
 
     public void goToLoginPage() {
-        String url = getProperty("url") + "/#/login";
-        driver.get(url);
+        driver.get(targetUrl + "/#/login");
     }
 
     public void login() {
@@ -86,13 +85,15 @@ public class JuiceShopPage {
     }
 
     public boolean isLoggedIn() {
-        // Check for an element that is only visible after logging in
-        // For example, a logout button or a user profile icon
         try {
-            WebElement logoutButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button[aria-label='Show the shopping cart']"))); // Adjust the ID or locator as needed
+            WebElement logoutButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button[aria-label='Show the shopping cart']")));
             return logoutButton.isDisplayed();
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getTargetUrl() {
+        return this.targetUrl;
     }
 }
