@@ -2,6 +2,8 @@ package steps;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.AfterStep;
+import io.cucumber.java.Scenario;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -68,6 +70,24 @@ public class Hooks {
         } else if ("active".equals(scanType)) {
             performActiveScan(juiceShopPage.getTargetUrl());
             generateZapReport("active-scan-report.html");
+        }
+    }
+
+    @AfterStep
+    public void afterStep(Scenario scenario) {
+        String currentUrl = driver.getCurrentUrl();
+
+        try {
+            if ("passive".equals(scanType)) {
+                // For passive scan, we do not wait
+                api.pscan.enableAllScanners();
+                api.pscan.setEnabled("true");
+            } else if ("active".equals(scanType)) {
+                // For active scan, we wait for the scan to complete
+                performActiveScan(currentUrl);
+            }
+        } catch (ClientApiException e) {
+            e.printStackTrace();
         }
     }
 
