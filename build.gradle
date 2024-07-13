@@ -24,6 +24,6 @@ test {
     useJUnit()
     systemProperty 'scan', project.findProperty('scan') ?: 'false'
     systemProperty 'env', project.findProperty('env') ?: 'prod'
-    systemProperty 'headless', project.findProperty('headless') ?: 'true'
+    systemProperty 'headless', project.findProperty('headless') ?: 'false'
     systemProperty 'browser', project.findProperty('browser') ?: 'chrome'
 }
