@@ -63,5 +63,3 @@ nbdist/
 .DS_Store
 Thumbs.db
 
-# Environment Properties
-src/test/resources/environment.properties
