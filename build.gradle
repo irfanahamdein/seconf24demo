@@ -25,5 +25,5 @@ test {
     systemProperty 'scan', project.findProperty('scan') ?: 'false'
     systemProperty 'env', project.findProperty('env') ?: 'prod'
     systemProperty 'headless', project.findProperty('headless') ?: 'false'
-    systemProperty 'browser', project.findProperty('browser') ?: 'chrome'
+    systemProperty 'browser', project.findProperty('browser') ?: 'firefox'
 }

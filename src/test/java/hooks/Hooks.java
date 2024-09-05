@@ -8,6 +8,10 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.zaproxy.clientapi.core.ClientApi;
@@ -19,6 +23,8 @@ import pages.JuiceShopPage;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class Hooks {
 
@@ -33,21 +39,56 @@ public class Hooks {
 
     @Before
     public void setUp() {
-        WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-
-        if (!"false".equals(scanType)) {
-            Proxy proxy = new Proxy();
-            proxy.setHttpProxy(ZAP_ADDRESS + ":" + ZAP_PORT);
-            proxy.setSslProxy(ZAP_ADDRESS + ":" + ZAP_PORT);
-            options.setCapability(CapabilityType.PROXY, proxy);
+        Properties properties = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("browser.properties")) {
+            if (input == null) {
+                System.out.println("Sorry, unable to find browser.properties");
+                return;
+            }
+            properties.load(input);
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
 
-        if (isHeadless) {
-            options.addArguments("--headless");
+        String browser = System.getProperty("browser", properties.getProperty("browser", "chrome"));
+
+        switch (browser.toLowerCase()) {
+            case "firefox":
+                WebDriverManager.firefoxdriver().setup();
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                if (isHeadless) {
+                    firefoxOptions.addArguments("--headless");
+                }
+                driver = new FirefoxDriver(firefoxOptions);
+                break;
+            case "edge":
+                WebDriverManager.edgedriver().setup();
+                EdgeOptions edgeOptions = new EdgeOptions();
+                if (isHeadless) {
+                    edgeOptions.addArguments("--headless");
+                }
+                driver = new EdgeDriver(edgeOptions);
+                break;
+            case "chrome":
+            default:
+                WebDriverManager.chromedriver().setup();
+                ChromeOptions chromeOptions = new ChromeOptions();
+
+                if (!"false".equals(scanType)) {
+                    Proxy proxy = new Proxy();
+                    proxy.setHttpProxy(ZAP_ADDRESS + ":" + ZAP_PORT);
+                    proxy.setSslProxy(ZAP_ADDRESS + ":" + ZAP_PORT);
+                    chromeOptions.setCapability(CapabilityType.PROXY, proxy);
+                }
+
+                if (isHeadless) {
+                    chromeOptions.addArguments("--headless");
+                }
+
+                driver = new ChromeDriver(chromeOptions);
+                break;
         }
 
-        driver = new ChromeDriver(options);
         juiceShopPage = new JuiceShopPage(driver);
 
         if ("active".equals(scanType)) {
@@ -79,11 +120,9 @@ public class Hooks {
 
         try {
             if ("passive".equals(scanType)) {
-                // For passive scan, we do not wait
                 api.pscan.enableAllScanners();
                 api.pscan.setEnabled("true");
             } else if ("active".equals(scanType)) {
-                // For active scan, we wait for the scan to complete
                 performActiveScan(currentUrl);
             }
         } catch (ClientApiException e) {
@@ -95,10 +134,8 @@ public class Hooks {
         try {
             ApiResponse resp = api.ascan.scan(targetUrl, "True", "False", null, null, null);
 
-            // Scan response returns scan id to support concurrent scanning.
             String scanId = ((ApiResponseElement) resp).getValue();
 
-            // Poll the status until the scan is complete
             int progress;
             do {
                 progress = Integer.parseInt(((ApiResponseElement) api.ascan.status(scanId)).getValue());
